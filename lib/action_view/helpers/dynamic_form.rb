@@ -5,10 +5,14 @@ require 'active_support/core_ext/object/blank'
 
 module ActionView
   module Helpers
-    # The Active Record Helper makes it easier to create forms for records kept in instance variables. The most far-reaching is the +form+
-    # method that creates a complete form for all the basic content types of the record (not associations or aggregations, though). This
-    # is a great way of making the record quickly available for editing, but likely to prove lackluster for a complicated real-world form.
-    # In that case, it's better to use the +input+ method and the specialized +form+ methods in link:classes/ActionView/Helpers/FormHelper.html
+    # The Active Record Helper makes it easier to create forms for records kept in instance variables.
+    # The most far-reaching is the +form+
+    # method that creates a complete form for all the basic content types of the record
+    # (not associations or aggregations, though). This
+    # is a great way of making the record quickly available for editing,
+    # but likely to prove lackluster for a complicated real-world form.
+    # In that case, it's better to use the +input+ method and the specialized +form+ methods
+    # in link:classes/ActionView/Helpers/FormHelper.html
     module DynamicForm
       # Returns a default input tag for the type of object returned by the method. For example, if <tt>@post</tt>
       # has an attribute +title+ mapped to a +VARCHAR+ column that holds "Hello World":
@@ -19,7 +23,8 @@ module ActionView
         InstanceTag.new(record_name, method, self).to_tag(options)
       end
 
-      # Returns an entire form with all needed input tags for a specified Active Record object. For example, if <tt>@post</tt>
+      # Returns an entire form with all needed input tags for a specified Active Record object.
+      # For example, if <tt>@post</tt>
       # has attributes named +title+ of type +VARCHAR+ and +body+ of type +TEXT+ then
       #
       #   form("post")
@@ -74,12 +79,13 @@ module ActionView
         record = convert_to_model(record)
 
         options = options.symbolize_keys
-        options[:action] ||= record.persisted? ? "update" : "create"
-        action = url_for(:action => options[:action], :id => record)
+        options[:action] ||= record.persisted? ? 'update' : 'create'
+        action = url_for(action: options[:action], id: record)
 
         submit_value = options[:submit_value] || options[:action].gsub(/[^\w]/, '').capitalize
 
-        contents = form_tag({:action => action}, :method =>(options[:method] || 'post'), :enctype => options[:multipart] ? 'multipart/form-data': nil)
+        contents = form_tag({ action: action }, method: (options[:method] || 'post'),
+                                                enctype: options[:multipart] ? 'multipart/form-data' : nil)
         contents.safe_concat hidden_field(record_name, :id) if record.persisted?
         contents.safe_concat all_input_tags(record, record_name, options)
         yield contents if block_given?
@@ -117,23 +123,24 @@ module ActionView
           options[:html_tag] = args[2] || 'div'
           options[:css_class] = args[3] || 'formError'
         end
-        options.reverse_merge!(:prepend_text => '', :append_text => '', :html_tag => 'div', :css_class => 'formError')
+        options.reverse_merge!(prepend_text: '', append_text: '', html_tag: 'div', css_class: 'formError')
 
         object = convert_to_model(object)
 
         if (obj = (object.respond_to?(:errors) ? object : instance_variable_get("@#{object}"))) &&
-          (errors = obj.errors[method]).presence
+           (errors = obj.errors[method]).presence
           content_tag(options[:html_tag],
-            (options[:prepend_text].html_safe << errors.first).safe_concat(options[:append_text]),
-            :class => options[:css_class]
-          )
+                      (options[:prepend_text].html_safe << errors.first).safe_concat(options[:append_text]),
+                      class: options[:css_class])
         else
           ''
         end
       end
 
-      # Returns a string with a <tt>DIV</tt> containing all of the error messages for the objects located as instance variables by the names
-      # given.  If more than one object is specified, the errors for the objects are displayed in the order that the object names are
+      # Returns a string with a <tt>DIV</tt> containing all of the error messages
+      # for the objects located as instance variables by the names
+      # given.  If more than one object is specified, the errors for the objects
+      # are displayed in the order that the object names are
       # provided.
       #
       # This <tt>DIV</tt> can be tailored by the following options:
@@ -165,7 +172,8 @@ module ActionView
       # this is a MyKlass::User object, this will use "user" as the name in the String. This
       # is taken from MyKlass::User.model_name.human, which can be overridden.
       #
-      # To specify more than one object, you simply list them; optionally, you can add an extra <tt>:object_name</tt> parameter, which
+      # To specify more than one object, you simply list them;
+      # optionally, you can add an extra <tt>:object_name</tt> parameter, which
       # will be the name used in the header message:
       #
       #   error_messages_for 'user_common', 'user', :object_name => 'user'
@@ -175,13 +183,16 @@ module ActionView
       #
       #   error_messages_for @user, @post
       #
-      # If the objects cannot be located as instance variables, you can add an extra <tt>:object</tt> parameter which gives the actual
+      # If the objects cannot be located as instance variables,
+      # you can add an extra <tt>:object</tt> parameter which gives the actual
       # object (or array of objects to use):
       #
       #   error_messages_for 'user', :object => @question.user
       #
-      # NOTE: This is a pre-packaged presentation of the errors with embedded strings and a certain HTML structure. If what
-      # you need is significantly different from the default presentation, it makes plenty of sense to access the <tt>object.errors</tt>
+      # NOTE: This is a pre-packaged presentation of the errors with embedded
+      # strings and a certain HTML structure. If what
+      # you need is significantly different from the default presentation,
+      # it makes plenty of sense to access the <tt>object.errors</tt>
       # instance yourself and set it up. View the source of this method to see how easy it is.
       def error_messages_for(*params)
         options = params.extract_options!.symbolize_keys
@@ -190,19 +201,19 @@ module ActionView
           object = instance_variable_get("@#{object}") unless object.respond_to?(:to_model)
           object = convert_to_model(object)
 
-          if object.class.respond_to?(:model_name)
-            options[:object_name] ||= object.class.model_name.human.downcase
-          end
+          options[:object_name] ||= object.class.model_name.human.downcase if object.class.respond_to?(:model_name)
 
           object
         end
 
         objects.compact!
-        count = objects.inject(0) {|sum, object| sum + object.errors.count }
+        count = objects.inject(0) { |sum, object| sum + object.errors.count }
 
-        unless count.zero?
+        if count.zero?
+          ''
+        else
           html = {}
-          [:id, :class].each do |key|
+          %i[id class].each do |key|
             if options.include?(key)
               value = options[key]
               html[key] = value unless value.blank?
@@ -212,20 +223,20 @@ module ActionView
           end
           options[:object_name] ||= params.first
 
-          I18n.with_options :locale => options[:locale], :scope => [:activerecord, :errors, :template] do |locale|
+          I18n.with_options locale: options[:locale], scope: %i[activerecord errors template] do |locale|
             header_message = if options.include?(:header_message)
-              options[:header_message]
-            else
-              locale.t :header, :count => count, :model => options[:object_name].to_s.gsub('_', ' ')
-            end
+                               options[:header_message]
+                             else
+                               locale.t :header, count: count, model: options[:object_name].to_s.gsub('_', ' ')
+                             end
 
             message = options.include?(:message) ? options[:message] : locale.t(:body)
 
-            error_messages = objects.sum do |object|
+            error_messages = objects.map do |object|
               object.errors.full_messages.map do |msg|
                 content_tag(:li, msg)
               end
-            end.join.html_safe
+            end.inject(:+).join.html_safe
 
             contents = ''
             contents << content_tag(options[:header_tag] || :h2, header_message) unless header_message.blank?
@@ -234,40 +245,41 @@ module ActionView
 
             content_tag(:div, contents.html_safe, html)
           end
-        else
-          ''
         end
       end
 
-    private
+      private
 
       def all_input_tags(record, record_name, options)
         input_block = options[:input_block] || default_input_block
-        record.class.content_columns.collect{ |column| input_block.call(record_name, column) }.join("\n")
+        record.class.content_columns.collect { |column| input_block.call(record_name, column) }.join("\n")
       end
 
       def default_input_block
-        Proc.new { |record, column| %(<p><label for="#{record}_#{column.name}">#{column.human_name}</label><br />#{input(record, column.name)}</p>) }
+        proc { |record, column|
+          %(<p><label for="#{record}_#{column.name}">#{column.human_name}</label><br />#{input(record,
+                                                                                               column.name)}</p>)
+        }
       end
 
       module InstanceTagMethods
         def to_tag(options = {})
           case column_type
-            when :string
-              field_type = @method_name.include?("password") ? "password" : "text"
-              to_input_field_tag(field_type, options)
-            when :text
-              to_text_area_tag(options)
-            when :integer, :float, :decimal
-              to_input_field_tag("text", options)
-            when :date
-              to_date_select_tag(options)
-            when :datetime, :timestamp
-              to_datetime_select_tag(options)
-            when :time
-              to_time_select_tag(options)
-            when :boolean
-              to_boolean_select_tag(options).html_safe
+          when :string
+            field_type = @method_name.include?('password') ? 'password' : 'text'
+            to_input_field_tag(field_type, options)
+          when :text
+            to_text_area_tag(options)
+          when :integer, :float, :decimal
+            to_input_field_tag('text', options)
+          when :date
+            to_date_select_tag(options)
+          when :datetime, :timestamp
+            to_datetime_select_tag(options)
+          when :time
+            to_time_select_tag(options)
+          when :boolean
+            to_boolean_select_tag(options).html_safe
           end
         end
 
@@ -297,4 +309,4 @@ module ActionView
   end
 end
 
-I18n.load_path << File.expand_path("../../locale/en.yml", __FILE__)
+I18n.load_path << File.expand_path('../locale/en.yml', __dir__)
